@@ -1,0 +1,29 @@
+{
+  "name": "roomraah-chat-assistant",
+  "version": "0.1.0",
+  "description": "An Angular hostel-search assistant: parses a message in Roman Urdu or English, searches the RoomRaah API, ranks the results deterministically, and asks a language model only to write the reply.",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "test:ci": "ng test --watch=false"
+  },
+  "dependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.4",
+    "@angular/cli": "^22.1.4",
+    "@angular/compiler-cli": "^22.1.0",
+    "jsdom": "^28.0.0",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
+  }
+}

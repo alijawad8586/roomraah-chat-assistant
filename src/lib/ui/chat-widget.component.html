@@ -1,0 +1,110 @@
+@if (!isOpen()) {
+  <button
+    type="button"
+    class="chat-launcher"
+    data-testid="chat-launcher"
+    aria-label="Hostel dhoondne mein madad chahiye? Assistant kholein"
+    (click)="open()"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M4 4h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V5a1 1 0 0 1 1-1Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+} @else {
+  <section class="chat-panel" role="dialog" aria-label="RoomRaah assistant" data-testid="chat-panel">
+    <header class="chat-header">
+      <div>
+        <h2 class="chat-title">RoomRaah Assistant</h2>
+        <p class="chat-subtitle">Budget aur ilaqa batayein, main hostel dhoond deta hoon.</p>
+      </div>
+      <button type="button" class="chat-close" aria-label="Assistant band karein" (click)="close()">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path
+            d="M6 6l12 12M18 6L6 18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    </header>
+
+    <!-- `aria-live` so a reply that arrives while focus is in the composer is announced. -->
+    <div class="chat-log" #log role="log" aria-live="polite" data-testid="chat-log">
+      @if (messages().length === 0 && !sending()) {
+        <app-empty-state
+          type="custom"
+          title="Poochhiye, main dhoondta hoon"
+          description="Misal ke taur par: “mere nazdeek 25k tak boys hostel chahiye, wifi aur mess ke sath”."
+          data-testid="chat-empty-state"
+        />
+      }
+
+      @for (message of messages(); track $index) {
+        <div
+          class="chat-bubble"
+          [class.is-user]="message.role === 'user'"
+          [class.is-assistant]="message.role === 'assistant'"
+          [attr.data-role]="message.role"
+          data-testid="chat-bubble"
+        >
+          {{ message.text }}
+        </div>
+      }
+
+      @if (sending()) {
+        <div class="chat-typing" data-testid="chat-typing">
+          <app-spinner size="sm" color="navy" label="Assistant jawab likh raha hai" />
+          <span class="chat-typing-text">Hostels dhoonde jaa rahe hain…</span>
+        </div>
+      }
+
+      @if (failedText()) {
+        <div class="chat-retry" data-testid="chat-retry">
+          <app-button
+            variant="outline"
+            size="sm"
+            [disabled]="sending()"
+            data-testid="chat-retry-button"
+            (clicked)="retry()"
+          >
+            Dobara koshish karein
+          </app-button>
+        </div>
+      }
+    </div>
+
+    <form class="chat-composer" (submit)="onSubmit($event)">
+      <label class="chat-input-label" for="chat-input">Apna sawaal likhein</label>
+      <input
+        id="chat-input"
+        class="chat-input"
+        type="text"
+        autocomplete="off"
+        placeholder="Misal: 25k tak boys hostel wifi ke sath"
+        data-testid="chat-input"
+        [value]="draft()"
+        [disabled]="sending()"
+        (input)="onInput($event)"
+      />
+      <app-button
+        type="submit"
+        variant="primary"
+        size="md"
+        [loading]="sending()"
+        [disabled]="draft().trim().length === 0"
+        data-testid="chat-send"
+        (clicked)="submit()"
+      >
+        Bhejein
+      </app-button>
+    </form>
+  </section>
+}

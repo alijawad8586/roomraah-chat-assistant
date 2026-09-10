@@ -1,0 +1,251 @@
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+// Fixed to the viewport rather than to the page, so the bubble stays put while a long
+// search page scrolls underneath it. The host itself is a zero-size anchor: the launcher and
+// the panel each position themselves against the same corner.
+:host {
+  position: fixed;
+  right: $space-4;
+  bottom: $space-4;
+  z-index: 900;
+  display: block;
+
+  @include tablet-up {
+    right: $space-6;
+    bottom: $space-6;
+  }
+}
+
+// --- Launcher -------------------------------------------------------------------------
+
+.chat-launcher {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: none;
+  border-radius: $radius-full;
+  background: $color-navy;
+  color: $color-text-on-primary;
+  box-shadow: $shadow-md;
+  cursor: pointer;
+  transition: background $transition-base, transform $transition-fast;
+
+  @include focus-visible;
+
+  &:hover {
+    background: $color-navy-hover;
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+// --- Panel ----------------------------------------------------------------------------
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: $color-surface;
+  border: 1px solid $color-slate-200;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+
+  // Phone: a bottom sheet. Anchored to the host's corner, it is pulled back out to the full
+  // width of the viewport, because a 380px card on a 360px screen is not a card.
+  position: fixed;
+  right: $space-4;
+  bottom: $space-4;
+  left: $space-4;
+  height: min(70vh, 32rem);
+
+  @include tablet-up {
+    position: static;
+    width: 22rem;
+    height: 30rem;
+  }
+
+  @include laptop-up {
+    width: 24rem;
+    height: 32rem;
+  }
+
+  // Above 1440px the site is capped and centred, so the panel sits further in from the
+  // physical edge of a wide screen rather than out at the bezel.
+  @include desktop {
+    width: 26rem;
+    height: 34rem;
+  }
+}
+
+.chat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: $space-4;
+  background: $color-navy;
+  color: $color-text-on-primary;
+}
+
+.chat-title {
+  margin: 0;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+}
+
+.chat-subtitle {
+  margin: $space-1 0 0;
+  font-size: $font-size-xs;
+  line-height: $line-height-normal;
+  color: rgba($color-text-on-primary, 0.78);
+}
+
+.chat-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: $radius-sm;
+  background: transparent;
+  color: $color-text-on-primary;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba($color-text-on-primary, 0.14);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-text-on-primary;
+    outline-offset: 2px;
+  }
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+}
+
+// --- Message log ----------------------------------------------------------------------
+
+.chat-log {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4;
+  overflow-y: auto;
+  background: $color-background;
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: $space-3 $space-4;
+  font-size: $font-size-sm;
+  line-height: $line-height-relaxed;
+  // Replies are composed prose with line breaks in them; they should keep them.
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+
+  // The two roles differ by colour, by side and by which corner is squared off, so the
+  // conversation still reads correctly without colour alone carrying the distinction.
+  &.is-user {
+    align-self: flex-end;
+    background: $color-navy;
+    color: $color-text-on-primary;
+    border-radius: $radius-lg $radius-lg $radius-xs $radius-lg;
+  }
+
+  &.is-assistant {
+    align-self: flex-start;
+    background: $color-surface;
+    color: $color-slate-800;
+    border: 1px solid $color-slate-200;
+    border-radius: $radius-lg $radius-lg $radius-lg $radius-xs;
+  }
+}
+
+.chat-typing {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: $color-surface;
+  border: 1px solid $color-slate-200;
+  border-radius: $radius-lg;
+}
+
+.chat-typing-text {
+  font-size: $font-size-xs;
+  color: $color-slate-600;
+}
+
+.chat-retry {
+  align-self: flex-start;
+}
+
+// --- Composer -------------------------------------------------------------------------
+
+.chat-composer {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  border-top: 1px solid $color-slate-200;
+  background: $color-surface;
+}
+
+.chat-input-label {
+  @include sr-only;
+}
+
+.chat-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: $space-2 $space-3;
+  font-family: $font-family-base;
+  font-size: $font-size-sm;
+  color: $color-slate-800;
+  background: $color-surface;
+  border: 1px solid $color-slate-300;
+  border-radius: $radius-md;
+
+  @include focus-visible;
+
+  &::placeholder {
+    color: $color-slate-400;
+  }
+
+  &:disabled {
+    background: $color-surface-muted;
+    color: $color-slate-500;
+  }
+}
